@@ -14,7 +14,7 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        self.browser.get('http://localhost:8001')
+        self.browser.get('http://localhost:8000')
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do', header_text)
@@ -35,9 +35,21 @@ class NewVisitorTest(unittest.TestCase):
         # после загрузки должен появиться наш эллемент в таблице
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1. Купить перья' for row in rows), "Новый элемент списка не появился в таблице"
-        )
+
+        #пробуем добавить второй эллемент
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Сделать мушку')
+
+        # после нажатия Enter страница обновиться, ждем загрузку одну секунду
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        # после загрузки должен появиться наш эллемент в таблице
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+
+        self.assertIn('1: Купить перья', [row.text for row in rows])
+        self.assertIn('2: Сделать мушку ', [row.text for row in rows])
 
         self.fail('Закончить тест!')
 
