@@ -1,41 +1,10 @@
-from django.test import LiveServerTestCase
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
-import time, os
 
 
-
-MAX_WAIT = 10
-
-
-class NewVisitorTest(StaticLiveServerTestCase):
+class NewVisitorTest(FunctionalTest):
     """тест нового посетителя"""
-
-    def setUp(self):
-        self.browser = webdriver.Firefox()
-        staging_server = os.environ.get('STAGING_SERVER')
-        if staging_server:
-            self.live_server_url = 'http://' + staging_server
-
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def wait_for_row_in_list_table(self, row_text):
-        """ожидать строку в таблице списка"""
-        start_time = time.time()
-        while True:
-            try:
-                table = self.browser.find_element_by_id('id_list_table')
-                rows = table.find_elements_by_tag_name('tr')
-                self.assertIn(row_text, [row.text for row in rows])
-                return
-            except (AssertionError, WebDriverException) as e:
-                if time.time() - start_time > MAX_WAIT:
-                    raise e
-                time.sleep(0.5)
 
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
@@ -108,6 +77,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertNotIn('Купить павлиньи перья', page_text)
         self.assertIn('Купить молоко', page_text)
 
+class LayoutAndStylingTest(FunctionalTest):
+    '''тест макета и стилевого оформления'''
 
     def test_layout_and_styling(self):
         """тест макета и стилевого оформления"""
