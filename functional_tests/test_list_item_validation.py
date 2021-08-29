@@ -1,5 +1,7 @@
+from django.core.exceptions import ValidationError
 from selenium.webdriver.common.keys import Keys
 from .base import FunctionalTest
+from lists.models import List, Item
 
 
 class ItemValidationTest(FunctionalTest):
@@ -7,6 +9,12 @@ class ItemValidationTest(FunctionalTest):
 
     def test_cannot_add_empty_list_items(self):
         """тест: нельзя добавлять пустые элементы списка"""
+        list_ = List.objects.create()
+        item = Item(list=list_, text='')
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()
+
         # отправляем пустое поле.
         self.browser.get(self.live_server_url)
         self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
