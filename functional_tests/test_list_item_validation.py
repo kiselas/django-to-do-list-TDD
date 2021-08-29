@@ -5,43 +5,41 @@ from lists.models import List, Item
 
 
 class ItemValidationTest(FunctionalTest):
-    '''тест валидации элемента списка'''
+    """тест валидации элемента списка"""
 
     def test_cannot_add_empty_list_items(self):
         """тест: нельзя добавлять пустые элементы списка"""
-        list_ = List.objects.create()
-        item = Item(list=list_, text='')
-        with self.assertRaises(ValidationError):
-            item.save()
-            item.full_clean()
-
         # отправляем пустое поле.
         self.browser.get(self.live_server_url)
-        self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
+        self.get_item_input_box().send_keys(Keys.ENTER)
         # проверяем появилась ли ошибка
-        self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "You can't have an empty list item"
+        self.wait_for(lambda: self.browser.find_elements_by_css_selector(
+            '#id_text:invalid'
         ))
 
         # теперь отправляем поле с текстом
-        self.browser.find_element_by_id('id_new_item').send_keys('Buy milk')
-        self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
+        self.get_item_input_box().send_keys('Buy milk')
+        self.wait_for(lambda: self.browser.find_elements_by_css_selector(
+            '#id_text:valid'
+        ))
+        self.get_item_input_box().send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy milk')
 
         # после чего опят пробуем отправить пустой элемент
-        self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
+        self.get_item_input_box().send_keys(Keys.ENTER)
 
         # снова появляется ошибка
-        self.wait_for(lambda: self.assertEqual(
-            self.browser.find_element_by_css_selector('.has-error').text,
-            "You can't have an empty list item"
+        self.wait_for_row_in_list_table('1: Buy milk')
+        self.wait_for(lambda: self.browser.find_elements_by_css_selector(
+            '#id_text:invalid'
         ))
 
         # теперь отправляем элемент с текстом и проверяем, что оба элемента на месте
         # И она может его исправить, заполнив поле неким текстом
-        self.browser.find_element_by_id('id_new_item').send_keys('Make tea')
-        self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
+        self.get_item_input_box().send_keys('Make tea')
+        self.wait_for(lambda: self.browser.find_elements_by_css_selector(
+            '#id_text:valid'
+        ))
+        self.get_item_input_box().send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Buy milk')
         self.wait_for_row_in_list_table('2: Make tea')
-

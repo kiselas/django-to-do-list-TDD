@@ -12,7 +12,7 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do', header_text)
 
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
 
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
@@ -26,7 +26,7 @@ class NewVisitorTest(FunctionalTest):
         self.wait_for_row_in_list_table("1: Купить перья")
 
         # пробуем добавить второй эллемент
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Сделать мушку')
 
         # после нажатия Enter страница обновиться, ждем загрузку одну секунду
@@ -39,7 +39,7 @@ class NewVisitorTest(FunctionalTest):
         '''тест: несколько пользователей могут начать свои списки по разным ссылкам'''
         # эдит начинает свой список
         self.browser.get(self.live_server_url)
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Купить павлиньи перья')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Купить павлиньи перья')
@@ -62,7 +62,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertNotIn('Сделать мушку', page_text)
 
         # Фрэнсис начинает новый список, вводя новый элемент
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Купить молоко')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: Купить молоко')
@@ -87,7 +87,7 @@ class LayoutAndStylingTest(FunctionalTest):
         self.browser.set_window_size(1024, 768)
 
         # он замечает, что поле ввода аккуратно центрировано
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2, 512,
             delta=10
@@ -95,7 +95,7 @@ class LayoutAndStylingTest(FunctionalTest):
         inputbox.send_keys('testing')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: testing')
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
